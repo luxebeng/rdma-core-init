@@ -41,7 +41,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include <infiniband/mad.h>
+//#include <infiniband/mad.h>
 
 #include <ccan/minmax.h>
 
@@ -95,6 +95,7 @@ void close_node_name_map(nn_map_t * map)
 	free(map);
 }
 
+#define IB_SMP_DATA_SIZE	64
 char *remap_node_name(nn_map_t * map, uint64_t target_guid, const char *nodedesc)
 {
 	char *rc = NULL;

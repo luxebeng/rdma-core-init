@@ -1,37 +1,19 @@
 publish_internal_headers(rdma
-  rdma/bnxt_re-abi.h
-  rdma/cxgb4-abi.h
-  rdma/efa-abi.h
-  rdma/erdma-abi.h
-  rdma/hns-abi.h
   rdma/ib_user_ioctl_cmds.h
   rdma/ib_user_ioctl_verbs.h
   rdma/ib_user_mad.h
   rdma/ib_user_sa.h
   rdma/ib_user_verbs.h
-  rdma/irdma-abi.h
-  rdma/mana-abi.h
-  rdma/mlx4-abi.h
   rdma/mlx5-abi.h
   rdma/mlx5_user_ioctl_cmds.h
   rdma/mlx5_user_ioctl_verbs.h
-  rdma/mthca-abi.h
-  rdma/ocrdma-abi.h
-  rdma/qedr-abi.h
   rdma/rdma_netlink.h
   rdma/rdma_user_cm.h
   rdma/rdma_user_ioctl.h
   rdma/rdma_user_ioctl_cmds.h
   rdma/rdma_user_rxe.h
-  rdma/rvt-abi.h
-  rdma/siw-abi.h
-  rdma/vmw_pvrdma-abi.h
   )
 
-publish_internal_headers(rdma/hfi
-  rdma/hfi/hfi1_ioctl.h
-  rdma/hfi/hfi1_user.h
-  )
 
 publish_internal_headers(linux
   linux/stddef.h
@@ -64,22 +46,9 @@ endfunction()
 
 # Transform the kernel ABIs used by the providers
 rdma_kernel_provider_abi(
-  rdma/bnxt_re-abi.h
-  rdma/cxgb4-abi.h
-  rdma/efa-abi.h
-  rdma/erdma-abi.h
-  rdma/hns-abi.h
   rdma/ib_user_verbs.h
-  rdma/irdma-abi.h
-  rdma/mana-abi.h
-  rdma/mlx4-abi.h
   rdma/mlx5-abi.h
-  rdma/mthca-abi.h
-  rdma/ocrdma-abi.h
-  rdma/qedr-abi.h
   rdma/rdma_user_rxe.h
-  rdma/siw-abi.h
-  rdma/vmw_pvrdma-abi.h
   )
 
 publish_headers(infiniband

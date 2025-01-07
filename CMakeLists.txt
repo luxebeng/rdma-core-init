@@ -182,21 +182,12 @@ include(CheckCSourceCompiles)
 include(CheckIncludeFile)
 include(CheckTypeSize)
 include(RDMA_EnableCStd)
-include(RDMA_Sparse)
+#include(RDMA_Sparse)
 include(RDMA_BuildType)
 include(RDMA_DoFixup)
 include(publish_headers)
 include(rdma_functions)
-include(pyverbs_functions)
-if (NO_MAN_PAGES)
-  # define empty stub functions to omit man page processing
-  function(rdma_man_pages)
-  endfunction()
-  function(rdma_alias_man_pages)
-  endfunction()
-else()
-  include(rdma_man)
-endif()
+#include(pyverbs_functions)
 
 if (NOT DEFINED ENABLE_STATIC)
   set(ENABLE_STATIC "OFF" CACHE BOOL "Produce static linking libraries as well as shared libraries.")
@@ -254,7 +245,7 @@ if (NOT SYSTEMCTL_BIN)
   set (SYSTEMCTL_BIN "/bin/systemctl")
 endif()
 
-RDMA_CheckSparse()
+#RDMA_CheckSparse()
 
 # Require GNU99 mode
 RDMA_EnableCStd()
@@ -463,13 +454,6 @@ else()
   set(HAVE_FULL_SYMBOL_VERSIONS 1)
 endif()
 
-set(NO_MAN_PAGES "OFF" CACHE BOOL "Disable build/install of man pages")
-if (NOT NO_MAN_PAGES)
-  # Look for pandoc and rst2man for making manual pages
-  FIND_PACKAGE(pandoc)
-  FIND_PACKAGE(rst2man)
-endif ()
-
 #-------------------------
 # Find libraries
 # pthread
@@ -478,16 +462,6 @@ FIND_PACKAGE (Threads REQUIRED)
 FIND_PACKAGE(PkgConfig REQUIRED)
 
 # libnl
-if (NOT DEFINED ENABLE_RESOLVE_NEIGH)
-  set(ENABLE_RESOLVE_NEIGH "ON" CACHE BOOL "Enable internal resolution of neighbours for Etherent")
-endif()
-if (ENABLE_RESOLVE_NEIGH)
-  # FIXME use of pkgconfig is discouraged
-  pkg_check_modules(NL libnl-3.0 libnl-route-3.0 REQUIRED)
-  include_directories(${NL_INCLUDE_DIRS})
-  link_directories(${NL_LIBRARY_DIRS})
-  set(NL_KIND 3)
-else()
   set(NL_KIND 0)
   set(NL_LIBRARIES "")
   RDMA_DoFixup(0 "netlink/attr.h")
@@ -499,7 +473,6 @@ else()
   RDMA_DoFixup(0 "netlink/route/neighbour.h")
   RDMA_DoFixup(0 "netlink/route/route.h")
   RDMA_DoFixup(0 "netlink/route/rtnl.h")
-endif()
 
 # Older stuff blows up if these headers are included together
 if (NOT NL_KIND EQUAL 0)
@@ -641,20 +614,6 @@ RDMA_Check_C_Compiles(HAVE_GLIBC_FXSTAT "
 RDMA_DoFixup("${HAVE_GLIBC_FXSTAT}" "sys/stat.h")
 
 
-# glibc before 2.35 does not necesarily define the HWCAP_S390_PCI_MIO hardware
-# capability bit constant. Check for it and if necessary shim it in such that
-# kernel support for PCI MIO instructions can always be checked.
-RDMA_Check_C_Compiles(HAVE_GLIBC_HWCAP_S390_PCI_MIO "
- #if defined(__s390x__)
- #include <sys/auxv.h>
- int main(int argc, const char *argv[]) {
- return !!(getauxval(AT_HWCAP) & HWCAP_S390_PCI_MIO);}
- #else
- int main(int argc, const char *argv[]) {return 0;}
- #endif
- ")
-RDMA_DoFixup("${HAVE_GLIBC_HWCAP_S390_PCI_MIO}" "sys/auxv.h")
-
 #-------------------------
 # Build Prep
 # Write out a git ignore file to the build directory if it isn't the source
@@ -699,45 +658,25 @@ add_subdirectory(ccan)
 add_subdirectory(util)
 add_subdirectory(util/tests)
 #add_subdirectory(Documentation)
-add_subdirectory(kernel-boot)
+#add_subdirectory(kernel-boot)
 add_subdirectory(kernel-headers)
 # Libraries
-add_subdirectory(libibumad)
-add_subdirectory(libibumad/man)
+#add_subdirectory(libibumad)
+#add_subdirectory(libibumad/man)
 add_subdirectory(libibverbs)
-add_subdirectory(libibverbs/man)
+#add_subdirectory(libibverbs/man)
 #add_subdirectory(librdmacm)
 #add_subdirectory(librdmacm/man)
 
 # Providers
 if (HAVE_COHERENT_DMA)
-#add_subdirectory(providers/bnxt_re)
-#add_subdirectory(providers/cxgb4) # NO SPARSE
-#add_subdirectory(providers/efa)
-#add_subdirectory(providers/efa/man)
-#add_subdirectory(providers/erdma)
-#add_subdirectory(providers/hns)
-#add_subdirectory(providers/hns/man)
-#add_subdirectory(providers/irdma)
-#add_subdirectory(providers/mana)
-#add_subdirectory(providers/mana/man)
-#add_subdirectory(providers/mlx4)
-#add_subdirectory(providers/mlx4/man)
 add_subdirectory(providers/mlx5)
-add_subdirectory(providers/mlx5/man)
-#add_subdirectory(providers/mthca)
-#add_subdirectory(providers/ocrdma)
-#add_subdirectory(providers/qedr)
-#add_subdirectory(providers/vmw_pvrdma)
+#add_subdirectory(providers/mlx5/man)
 endif()
-
-#add_subdirectory(providers/hfi1verbs)
-#add_subdirectory(providers/ipathverbs)
-#add_subdirectory(providers/rxe)
-#add_subdirectory(providers/rxe/man)
+add_subdirectory(providers/rxe)
 #add_subdirectory(providers/siw)
 
-add_subdirectory(libibmad)
+#add_subdirectory(libibmad)
 #add_subdirectory(libibnetdisc)
 #add_subdirectory(libibnetdisc/man)
 #add_subdirectory(infiniband-diags)
@@ -806,24 +745,6 @@ else()
     message(STATUS " netlink/route/link.h and net/if.h NOT co-includable (old headers)")
   endif()
 endif()
-if (NO_MAN_PAGES)
-  message(STATUS " man pages NOT built")
-else()
-  if (NOT PANDOC_FOUND)
-    if (NOT EXISTS "${PROJECT_SOURCE_DIR}/buildlib/pandoc-prebuilt")
-      message(STATUS " pandoc NOT found and NO prebuilt man pages. 'install' disabled")
-    else()
-      message(STATUS " pandoc NOT found (using prebuilt man pages)")
-    endif()
-  endif()
-  if (NOT RST2MAN_FOUND)
-    if (NOT EXISTS "${PROJECT_SOURCE_DIR}/buildlib/pandoc-prebuilt")
-      message(STATUS " rst2man NOT found and NO prebuilt man pages. 'install' disabled")
-    else()
-      message(STATUS " rst2man NOT found (using prebuilt man pages)")
-    endif()
-  endif()
-endif()
 if (NOT CYTHON_EXECUTABLE)
   message(STATUS " cython NOT found (disabling pyverbs)")
 endif()
@@ -856,7 +777,4 @@ if (NOT HAVE_TARGET_SSE)
 endif()
 if (NOT DRM_INCLUDE_DIRS)
   message(STATUS " DMABUF NOT supported (disabling some tests)")
-endif()
-if (NOT HAVE_GLIBC_HWCAP_S390_PCI_MIO )
-  message(STATUS " Glibc version does not contain the HWCAP_S390_PCI_MIO bit, using shim version")
 endif()
