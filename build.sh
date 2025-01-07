@@ -4,7 +4,7 @@ set -e
 SRCDIR=`dirname $0`
 BUILDDIR="$SRCDIR/build"
 
-EXTRA_CMAKE_FLAGS="-DENABLE_RESOLVE_NEIGH=0"
+EXTRA_CMAKE_FLAGS=""
 
 mkdir -p "$BUILDDIR"
 
